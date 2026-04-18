@@ -49,7 +49,30 @@ def group_pages(results):
         
         grouped[category].append(page)
 
-    return grouped
+    return grouped   # it would be something like {catx:[1,2,3],catb:[5,6,7]}
+
+#it is basically what each node will look like so for that we are sending pages
+def prepare_llm_input(doc, pages, instruction):
+    content = []
+
+    content.append({
+        "type": "text",
+        "text": instruction
+    })
+
+    for page_num in pages:
+        page = doc[page_num - 1]
+        pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+        img_base64 = base64.b64encode(pix.tobytes("png")).decode("utf-8")
+
+        content.append({
+            "type": "image_url",
+            "image_url": {
+                "url": f"data:image/png;base64,{img_base64}"
+            }
+        })
+
+    return content # in short our content here is the actual prompt
 
 
 
